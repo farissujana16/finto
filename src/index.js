@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const isProduction = process.env.NODE_ENV === "production";
+const isVercel = !!process.env.VERCEL;
 
 const PORT = process.env.PORT || (isProduction ? undefined : 5000);
 const express = require("express");
@@ -71,7 +72,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-if (!isProduction) {
+if (!isVercel) {
   app.listen(PORT, () => {
     console.log(`Server berjalan di port ${PORT}`);
     if (!isProduction) {
