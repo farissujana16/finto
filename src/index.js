@@ -1,13 +1,13 @@
-require('dotenv').config()
+require("dotenv").config();
 
 const isProduction = process.env.NODE_ENV === "production";
 
 const PORT = process.env.PORT || (isProduction ? undefined : 5000);
-const express = require('express');
-const cors = require('cors');
-const sequelize = require('./config/database');
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./config/swagger');
+const express = require("express");
+const cors = require("cors");
+const sequelize = require("./config/database");
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./config/swagger");
 
 const app = express();
 
@@ -48,35 +48,35 @@ app.get("/scalar", (req, res) => {
   `);
 });
 
-const authRoutes = require('./routes/authRoutes');
-app.use('/auth', authRoutes);
+const authRoutes = require("./routes/authRoutes");
+app.use("/auth", authRoutes);
 
-const categoriesRoutes = require('./routes/categoriesRoutes');
-const accountRoutes = require('./routes/accountRoutes');
-const budgetRoutes = require('./routes/budgetRoutes');
-const goalRoutes = require('./routes/goalRoutes');
-const transactionRoutes = require('./routes/transactionRoutes');
-const dashboardRoutes = require('./routes/dashboardRoutes');
+const categoriesRoutes = require("./routes/categoriesRoutes");
+const accountRoutes = require("./routes/accountRoutes");
+const budgetRoutes = require("./routes/budgetRoutes");
+const goalRoutes = require("./routes/goalRoutes");
+const transactionRoutes = require("./routes/transactionRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 // Tambahkan route otomatis di sini
-app.use('/dashboard', dashboardRoutes);
-app.use('/transaction', transactionRoutes);
-app.use('/goal', goalRoutes);
-app.use('/budget', budgetRoutes);
-app.use('/account', accountRoutes);
-app.use('/categories', categoriesRoutes);
+app.use("/dashboard", dashboardRoutes);
+app.use("/transaction", transactionRoutes);
+app.use("/goal", goalRoutes);
+app.use("/budget", budgetRoutes);
+app.use("/account", accountRoutes);
+app.use("/categories", categoriesRoutes);
 
 app.use((err, req, res, next) => {
-    res.status(500).json({
-    message: isProduction
-        ? "Internal Server Error"
-        : err.message,
+  res.status(500).json({
+    message: isProduction ? "Internal Server Error" : err.message,
+  });
 });
-})
 
-app.listen(PORT, () => {
+if (!isProduction) {
+  app.listen(PORT, () => {
     console.log(`Server berjalan di port ${PORT}`);
     if (!isProduction) {
       console.log(`Swagger berjalan pada url http://localhost:${PORT}/docs`);
       console.log(`Scalar berjalan pada url http://localhost:${PORT}/scalar`);
     }
-});
+  });
+}
