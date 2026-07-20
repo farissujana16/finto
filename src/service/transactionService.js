@@ -84,7 +84,50 @@ async function update(id, p) {
 }
 
 async function remove(id) {
-  return await Transaction.destroy({ where: { id } });
+  const t = await sequelize.transaction();
+  try {
+    const oldTrans = await Transaction.findOne({
+      where: { id },
+      transaction: t,
+    });
+
+    if (!oldTrans) {
+      throw new Error("Transaksi tidak ditemukan");
+    }
+
+    // KEMBALIKAN SALDO
+
+    if (oldTrans.type === "transfer") {
+      await Account.increment("balance", {
+        by: oldTrans.amount,
+        where: { id: oldTrans.accountId },
+        transaction: t,
+      });
+      await Account.decrement("balance", {
+        by: oldTrans.amount,
+        where: { id: oldTrans.toAccountId },
+        transaction: t,
+      });
+    } else if (oldTrans.type === "expense") {
+      await Account.increment("balance", {
+        by: oldTrans.amount,
+        where: { id: oldTrans.accountId },
+        transaction: t,
+      });
+    } else if (oldTrans.type === "income") {
+      await Account.decrement("balance", {
+        by: oldTrans.amount,
+        where: { id: oldTrans.accountId },
+        transaction: t,
+      });
+    }
+    await Transaction.destroy({ where: { id } });
+    await t.commit();
+  } catch (error) {
+    await t.rollback();
+    console.error("Gagal hapus data karena error:", error.message);
+    throw error;
+  }
 }
 
 async function findId(id) {
