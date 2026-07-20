@@ -16,9 +16,10 @@ if (process.env.DB_DIALECT === "sqlite") {
     process.env.DB_PASSWORD,
     {
       host: process.env.DB_HOST,
+      posrt: process.env.DB_PORT,
       dialect: process.env.DB_DIALECT,
       logging: isProduction ? false : console.log,
-    }
+    },
   );
 }
 
