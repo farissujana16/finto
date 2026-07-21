@@ -81,3 +81,5 @@ if (!isVercel) {
     }
   });
 }
+
+module.exports = app;
