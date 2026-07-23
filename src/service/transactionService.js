@@ -3,9 +3,41 @@ const Categories = require("../models/categoriesModels");
 const Account = require("../models/accountModels");
 const sequelize = require("../config/database");
 const { where } = require("sequelize");
-async function getAll(userId) {
+async function getAll(userId, filters) {
+  const where = { userId };
+
+  if (filters.category) {
+    where.categoryId = filters.category;
+  }
+
+  if (filters.type) {
+    where.type = filters.type;
+  }
+
+  if (filters.startDate && filters.endDate) {
+    where.transactionDate = {
+      [Op.between]: [filters.startDate, filters.endDate],
+    };
+  }
+  if (filters.search) {
+    where[Op.or] = [
+      {
+        description: {
+          [Op.iLike]: `%${filters.search}%`,
+        },
+      },
+    ];
+  }
+
+  // Pagination
+  if (filters.page && filters.limit) {
+    pagination.limit = Number(filters.limit);
+    pagination.offset = (Number(filters.page) - 1) * Number(filters.limit);
+  }
+
   return await Transaction.findAll({
-    where: { userId },
+    where,
+    ...pagination,
     include: [
       {
         model: Categories,

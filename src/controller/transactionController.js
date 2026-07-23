@@ -1,7 +1,19 @@
 const transactionService = require("../service/transactionService");
 async function getAll(req, res) {
   try {
-    const data = await transactionService.getAll(req.user.id);
+    const { category, account, type, startDate, endDate, search, page, limit } =
+      req.query;
+
+    const data = await transactionService.getAll(req.user.id, {
+      category,
+      account,
+      type,
+      startDate,
+      endDate,
+      search,
+      page,
+      limit,
+    });
     res.json({ message: "Success", data });
   } catch (e) {
     res.status(500).json({ message: e.message });
